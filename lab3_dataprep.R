@@ -11,7 +11,7 @@ library(ncdf4)
 
 #Download those files and move the precip data to your lab folder if you want to start the script from here.
 #List all the NetCDF files in the data folder
-era5_files<-list.files(path="data",pattern=".nc",full.names=T)
+era5_files<-list.files(path="lab3_geog4300_cant_beat_auburn/data",pattern=".nc",full.names=T)
 
 #Load each nc file and combine
 precip_50_54<-rast(era5_files[1])
@@ -36,7 +36,7 @@ years<-data.frame(dates=unique(substr(dates,1,4)))%>%
 head(precip_all)
 layers<-nlyr(precip_all)
 
-#Creaye a sum of precip for these rasters in year year
+#Create a sum of precip for these rasters in year year
 #How to extract a certain date from the raster stack that terra uses.
 # test<-precip_50_54[[time(precip_50_54)=="1950-07-01"]]
 # plot(test)
