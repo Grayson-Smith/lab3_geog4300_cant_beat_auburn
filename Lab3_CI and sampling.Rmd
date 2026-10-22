@@ -1,0 +1,133 @@
+---
+title: 'Geog 4/6300: Lab 3-Confidence intervals'
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Confidence intervals
+
+**Your name: {Name here}**
+
+**Overview:**
+
+In this lab, we will create confidence intervals for January precipitation in Washington during two time periods: 1950-1969 and 2005-2024. Using county-level precipitation data from the ERA5 dataset, you will estimate statewide precipitation patterns, then examine variation and change at the county level. We've summed the precipitation in January for each county over two twenty year time periods: 1950-1969 and 2005-2024. You'll be using those data to create confidence intervals at a state and county level.
+
+To load these data, load the csv file, which is included in the data folder:
+
+```{r message=FALSE}
+era5_data<-read_csv("data/precip_uswest_era5.csv")
+```
+
+This is a long format dataset including county identifiers, county population, median household income, and poverty rate. Census figures are based on the 2018-22 ACS. The last two columns (year, prcp_m, time_range) give the year and total precipitation in meters from the ERA5 NetCDF file, and two time ranges (1950-1969 and 2005-2024).
+
+The script used to create this dataframe is also provided in this repository ('lab3_dataprep'), along with rasters of the yearly mean total precipitation for Januaries in the two time periods of interest.
+
+For this lab to be marked complete, it must demonstrate the following learning standards:
+
+* 11. Create effective data visualizations across multiple chart types (line, scatter, histogram, Q-Q plot), applying appropriate aesthetic choices such as color, grouping, and labeling. (Tasks 2 and 5)
+* 12. Produce and interpret confidence interval plots that enable visual comparison of means and uncertainty across groups or time periods. (Tasks 2, 3, 5, and 6)
+* 13. Visualize spatial data using appropriate mapping tools, selecting suitable classification schemes and cartographic elements to support clear communication. (Task 7)
+* 14. Arrange and present tabular results in a readable format appropriate for a technical document or report. (Tasks 1 and 4)
+* 15. Use measures of central tendency and dispersion to describe the variables in tabular datasets (Tasks 1 and 4)
+* 20. Explaining how evidence from a sample supports conclusions about a population while acknowledging sampling variability and uncertainty. (Tasks 3 and 6)
+* 22. Construct and interpret confidence intervals, explaining how factors such as sample size and spatial scale affect the precision of an estimate. (Tasks 1, 3, 4 and 6)
+
+
+# Part 1: Calculating statewide confidence intervals for Washington's precipitation
+
+In the first part of this lab, you'll determine a confidence interval for Washington's precipitation for these two time periods. This can be helpful in identifying whether precipitation has changed across the state (e.g., whether the two confidence intervals overlap) using the county data as your sample.
+
+**Task 1** _Load the data and filter it to just include data for the state of Washington. Then create a table showing mean precipitation, standard deviation, number of observations (sample size), and upper/lower confidence interval bounds for each of the two time periods in the `time_range` field. Use `kable` to display the table when you are done._
+
+```{r Task1}
+
+```
+
+Using the code provided in class, create a ggplot graphic that visualizes these two confidence intervals. You'll want to use `geom_point` and `geom_linerange` to do so. Use states as the y-axis and mean precipitation as the x axis. Vary the color and position of the dots and lines for the mean/CI by the `time_range` variable. Feel free to also experiment with axis labels/themes to make the graph more appealing and accessible.
+
+**Task 2** _Create a ggplot graphic as described above to show the confidence intervals for precipitation in Washington for each time range._
+
+```{r Task3}
+
+```
+
+**Task 3** _Interpret your table and graph. What do they tell us about the change in Washington's precipitation during this time?_
+
+{Your response here.}
+
+# Part 2: Analyzing county data in Washington.
+In part 1, you ran a state level analysis. What if you wanted to identify where populations might be negatively affected by precipitation changes within a state? In this section, you'll look at the changes in precipitation **at county level** in Washington to 
+
+To start with, adapt your code from step 1 so that you create confidence intervals for **counties** instead of states. After creating that dataset, create another ggplot graph of those confidence intervals that you can compare to the state level data in Task 2 to examine how precipitation has changed across counties in Washington.
+
+**Task 4** _Create a summary table for January precipitation in Washington counties for both time periods. Use the same approach as in Task 1, but calculate statistics for counties rather than the state as a whole. Call the head of your table with `kable` when you are done._
+
+```{r Task5}
+
+```
+
+**Task 5** _Visualize the confidence intervals for the county-level data you generated in task 4, using the same style as you did for Task 2 above. For an optional extra challenge, visually highlight the counties where the confidence intervals between time periods do NOT overlap._
+
+```{r Task6}
+
+```
+
+**Task 6**: _Compare the size of the error terms for your county level data to the error terms at state level that you calculated in Task 1. Are they bigger or smaller? Explain why the formula you used for calculating the error terms produced error terms of different sizes. How is this difference visible in your ggplot graphs?_
+
+{Your response here.}
+
+**Task 7**: _Transform the county data from task 4 into wide format so that the means for each time period are in the same row for each county. Then calculate the change in precipitation between the time periods. Join this table to the geopackage file that contains county boundaries and census data, making sure that you only have Washington counties included - use the geopackage `data/acsdata_cty_westreg.gpkg`. Then use `tmap` to map out the difference in precipitation means across the two time periods. Make sure the legend of this map is interpretable._
+
+```{r Task7}
+
+```
+
+
+# Optional challenge section: Interpreting the implications of precipitation changes
+
+Now that you've calculated these means and confidence intervals, let's identify who might be most affected by changes in precipitation. To see who is affected, create a dummy variable that flags any counties with a decline of 5 centimeters or more (0.05 meters) with a 1, labeling all other counties with a 0. Use group_by and summarise to do the following:
+
+* Count the total population in each of these two county groups.
+* Calculate the mean value for median income and poverty rate in these two groups.
+
+**Task 8** _Create a dummy variable for counties with a change of 0.05 meters or more between the time periods. Calculate how many people currently live in these counties along with the mean value of median income (medinc) and poverty rate (pov_pop_pct) for those areas._
+
+```{r Task 10}
+
+```
+
+**Task 9** _Create a one paragraph summary of your results from tasks 7 and 8. What do you learn about how precipitation has changed in the last 70 years across the state of Washington? How would you describe the population affected by large drops in precipitation based on your results?_
+
+{Your response here.}
+
+
+Small multiples or multi-panel maps are often a helpful way to show change over time. See this page for more information about how these are created in `tmap`:
+
+* https://r-tmap.github.io/tmap/articles/basics_facets
+
+Using these tools, create a small multiples map of your precipitation data for counties in a state of your choice for all 40 years in these two time periods. This means you will have one figure with 40 individual maps, all of the same state in different years. These maps should allow easy comparison across years and should be clearly labeled so that they could be interpreted by someone with no knowledge of this assignment. 
+
+In addition, describe two interesting trends you see in the figure you created.
+
+```{r challenge, dpi=300}
+
+
+```
+
+{Your response here.}
+
+
+
+# Final submission stuff
+
+**Disclosure of assistance:** Besides class materials, what other sources of assistance did you use while completing this lab? These can include input from classmates, relevant material identified through web searches (e.g., Stack Overflow), or assistance from ChatGPT or other AI tools. How did these sources support your own learning in completing this lab?
+
+{Response here.}
+
+**Lab reflection:** How do you feel about the work you did on this lab? Was it easy, moderate, or hard? What are the biggest things you learned by completing it?
+
+{Your response here}
