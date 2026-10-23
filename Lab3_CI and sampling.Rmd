@@ -6,6 +6,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(knitr)
 ```
 
 ## Confidence intervals
@@ -44,6 +45,23 @@ In the first part of this lab, you'll determine a confidence interval for Washin
 **Task 1** _Load the data and filter it to just include data for the state of Washington. Then create a table showing mean precipitation, standard deviation, number of observations (sample size), and upper/lower confidence interval bounds for each of the two time periods in the `time_range` field. Use `kable` to display the table when you are done._
 
 ```{r Task1}
+era5_data_filtered <- era5_data %>%
+  filter(st_name == "Washington") %>%
+  group_by(time_range) %>%
+  mutate(mean_precip = mean(prcp_m),
+            sd_precip = sd(prcp_m),
+            num_obs = n(), #Do not include any var name here
+            se_precip = sd_precip/sqrt(num_obs))
+
+#Getting the necessary z-score:
+z.score_upper_95 = qnorm(0.975)
+
+era5_data_filtered_CI <- era5_data_filtered %>%
+  mutate(error = z.score_upper_95 * se_precip,
+         ci_upper = mean_precip + error,
+         ci_lower = mean_precip - error)
+
+kable(era5_data_filtered_CI)
 
 ```
 
