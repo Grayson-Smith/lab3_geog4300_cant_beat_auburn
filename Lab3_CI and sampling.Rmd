@@ -69,7 +69,11 @@ Using the code provided in class, create a ggplot graphic that visualizes these 
 
 **Task 2** _Create a ggplot graphic as described above to show the confidence intervals for precipitation in Washington for each time range._
 
-```{r Task3}
+```{r Task 2}
+ggplot(era5_data_filtered_CI %>% mutate(STATE=reorder(STATE,earn_mean)))+
+  geom_linerange(aes(xmin=ci_lower,xmax=ci_upper,y=STATE,group=time_range)) +
+  geom_point(aes(x=mean_precip, y=st_name))
+
 
 ```
 
