@@ -80,7 +80,7 @@ ggplot(era5_data_filtered_CI %>% mutate(State=reorder(st_name,mean_precip_meters
 
 **Task 3** _Interpret your table and graph. What do they tell us about the change in Washington's precipitation during this time?_
 
-Both the table and the graph seem to indicate that precipitation has quite notable decreased 
+Both the table and the graph seem to indicate that precipitation has quite notably decreased between the periods studied here (i.e. 1950-69 and 2005-24). The table demonstrates that the mean precip decreased by 0.037 meters on average between these two periods -- roughly 1.457 inches -- and the CIs graphed above indicate that this difference is statistically significant (as the CIs do not intersect). This indicates to me that there is a meaningful decrease in precip in Washington as a whole that is not explainable by chance. It will be interesting to examine this relationship on the county level in the tasks below -- and to look into potential physical causes of this precip decrease (potentially including climate change-enhanced effects). 
 
 # Part 2: Analyzing county data in Washington.
 In part 1, you ran a state level analysis. What if you wanted to identify where populations might be negatively affected by precipitation changes within a state? In this section, you'll look at the changes in precipitation **at county level** in Washington to 
