@@ -96,7 +96,7 @@ Now that you've calculated these means and confidence intervals, let's identify 
 
 **Task 8** _Create a dummy variable for counties with a change of 0.05 meters or more between the time periods. Calculate how many people currently live in these counties along with the mean value of median income (medinc) and poverty rate (pov_pop_pct) for those areas._
 
-```{r Task 10}
+```{r Task 8}
 
 ```
 
