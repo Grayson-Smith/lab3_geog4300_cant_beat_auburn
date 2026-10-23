@@ -47,19 +47,19 @@ In the first part of this lab, you'll determine a confidence interval for Washin
 ```{r Task1}
 era5_data_filtered <- era5_data %>%
   filter(st_name == "Washington") %>%
-  group_by(time_range) %>%
-  mutate(mean_precip = mean(prcp_m),
-            sd_precip = sd(prcp_m),
+  group_by(time_range,st_name) %>%
+  summarize(mean_precip_meters = mean(prcp_m),
+            sd_precip_meters = sd(prcp_m),
             num_obs = n(), #Do not include any var name here
-            se_precip = sd_precip/sqrt(num_obs))
+            se_precip_meters = sd_precip_meters/sqrt(num_obs))
 
 #Getting the necessary z-score:
 z.score_upper_95 = qnorm(0.975)
 
 era5_data_filtered_CI <- era5_data_filtered %>%
-  mutate(error = z.score_upper_95 * se_precip,
-         ci_upper = mean_precip + error,
-         ci_lower = mean_precip - error)
+  mutate(error = z.score_upper_95 * se_precip_meters,
+         ci_upper = mean_precip_meters + error,
+         ci_lower = mean_precip_meters - error)
 
 kable(era5_data_filtered_CI)
 
@@ -70,16 +70,17 @@ Using the code provided in class, create a ggplot graphic that visualizes these 
 **Task 2** _Create a ggplot graphic as described above to show the confidence intervals for precipitation in Washington for each time range._
 
 ```{r Task 2}
-ggplot(era5_data_filtered_CI %>% mutate(STATE=reorder(STATE,earn_mean)))+
-  geom_linerange(aes(xmin=ci_lower,xmax=ci_upper,y=STATE,group=time_range)) +
-  geom_point(aes(x=mean_precip, y=st_name))
-
+ggplot(era5_data_filtered_CI %>% mutate(State=reorder(st_name,mean_precip_meters)))+
+  geom_linerange(aes(xmin=ci_lower,xmax=ci_upper,y=State,group=time_range, color = time_range)) +
+  geom_point(aes(x=mean_precip_meters, y=State, color=time_range)) +
+  labs(title="Avg. Precip Confidence Intervals (WA, 1950-69 vs. 2005-24)") +
+  theme(plot.title = element_text(size=7))
 
 ```
 
 **Task 3** _Interpret your table and graph. What do they tell us about the change in Washington's precipitation during this time?_
 
-{Your response here.}
+Both the table and the graph seem to indicate that precipitation has quite notable decreased 
 
 # Part 2: Analyzing county data in Washington.
 In part 1, you ran a state level analysis. What if you wanted to identify where populations might be negatively affected by precipitation changes within a state? In this section, you'll look at the changes in precipitation **at county level** in Washington to 
