@@ -89,13 +89,37 @@ To start with, adapt your code from step 1 so that you create confidence interva
 
 **Task 4** _Create a summary table for January precipitation in Washington counties for both time periods. Use the same approach as in Task 1, but calculate statistics for counties rather than the state as a whole. Call the head of your table with `kable` when you are done._
 
-```{r Task5}
+```{r Task4}
+era5_data_filtered_cty <- era5_data %>%
+  filter(st_name == "Washington") %>%
+  group_by(time_range,cty_name) %>%
+  summarize(Mean_precip_meters = mean(prcp_m),
+            sd_precip_meters = sd(prcp_m),
+            num_obs = n(), #Do not include any var name here
+            se_precip_meters = sd_precip_meters/sqrt(num_obs))
 
+#Getting the necessary z-score:
+z.score_upper_95 = qnorm(0.975)
+
+era5_data_filtered_CI_cty <- era5_data_filtered_cty %>%
+  mutate(error = z.score_upper_95 * se_precip_meters,
+         ci_upper_cty = Mean_precip_meters + error,
+         ci_lower_cty = Mean_precip_meters - error)
+
+kable(era5_data_filtered_CI_cty)
 ```
 
 **Task 5** _Visualize the confidence intervals for the county-level data you generated in task 4, using the same style as you did for Task 2 above. For an optional extra challenge, visually highlight the counties where the confidence intervals between time periods do NOT overlap._
 
-```{r Task6}
+```{r Task5}
+ggplot(era5_data_filtered_CI_cty %>% mutate(County=reorder(cty_name,Mean_precip_meters)))+
+  geom_linerange(aes(xmin=ci_lower_cty,xmax=ci_upper_cty,y=County,group=time_range, color = time_range)) +
+  geom_point(aes(x=Mean_precip_meters, y=County, color=time_range)) +
+  labs(title="Avg. Precip Confidence Intervals (WA Counties, 1950-69 vs. 2005-24)") +
+  theme(plot.title = element_text(size=7)) + 
+  theme(axis.text.y = element_text(size=5.5))
+
+#Try to find a way to highlight the countie that do not overlap
 
 ```
 
