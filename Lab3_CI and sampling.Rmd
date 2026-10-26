@@ -48,7 +48,7 @@ In the first part of this lab, you'll determine a confidence interval for Washin
 era5_data_filtered <- era5_data %>%
   filter(st_name == "Washington") %>%
   group_by(time_range,st_name) %>%
-  summarize(mean_precip_meters = mean(prcp_m),
+  summarize(Mean_precip_meters = mean(prcp_m),
             sd_precip_meters = sd(prcp_m),
             num_obs = n(), #Do not include any var name here
             se_precip_meters = sd_precip_meters/sqrt(num_obs))
@@ -58,8 +58,8 @@ z.score_upper_95 = qnorm(0.975)
 
 era5_data_filtered_CI <- era5_data_filtered %>%
   mutate(error = z.score_upper_95 * se_precip_meters,
-         ci_upper = mean_precip_meters + error,
-         ci_lower = mean_precip_meters - error)
+         ci_upper = Mean_precip_meters + error,
+         ci_lower = Mean_precip_meters - error)
 
 kable(era5_data_filtered_CI)
 
@@ -70,9 +70,9 @@ Using the code provided in class, create a ggplot graphic that visualizes these 
 **Task 2** _Create a ggplot graphic as described above to show the confidence intervals for precipitation in Washington for each time range._
 
 ```{r Task 2}
-ggplot(era5_data_filtered_CI %>% mutate(State=reorder(st_name,mean_precip_meters)))+
+ggplot(era5_data_filtered_CI %>% mutate(State=reorder(st_name,Mean_precip_meters)))+
   geom_linerange(aes(xmin=ci_lower,xmax=ci_upper,y=State,group=time_range, color = time_range)) +
-  geom_point(aes(x=mean_precip_meters, y=State, color=time_range)) +
+  geom_point(aes(x=Mean_precip_meters, y=State, color=time_range)) +
   labs(title="Avg. Precip Confidence Intervals (WA, 1950-69 vs. 2005-24)") +
   theme(plot.title = element_text(size=7))
 
