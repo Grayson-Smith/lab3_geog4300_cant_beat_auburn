@@ -71,10 +71,10 @@ Using the code provided in class, create a ggplot graphic that visualizes these 
 
 ```{r Task 2}
 ggplot(era5_data_filtered_CI %>% mutate(State=reorder(st_name,Mean_precip_meters)))+
-  geom_linerange(aes(xmin=ci_lower,xmax=ci_upper,y=State,group=time_range, color = time_range)) +
-  geom_point(aes(x=Mean_precip_meters, y=State, color=time_range)) +
+  geom_linerange(aes(xmin=ci_lower,xmax=ci_upper,y=time_range,group=time_range, color = time_range)) +
+  geom_point(aes(x=Mean_precip_meters, y=time_range, color=time_range)) +
   labs(title="Avg. Precip Confidence Intervals (WA, 1950-69 vs. 2005-24)") +
-  theme(plot.title = element_text(size=7))
+  theme(plot.title = element_text(size=9))
 
 ```
 
