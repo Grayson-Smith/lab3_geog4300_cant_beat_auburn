@@ -14,7 +14,7 @@ library(terra)
 
 ## Confidence intervals
 
-**Your name: {Name here}**
+**Your name: Grayson Smith**
 
 **Overview:**
 
