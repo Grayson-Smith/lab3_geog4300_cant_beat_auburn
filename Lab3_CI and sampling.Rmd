@@ -50,8 +50,8 @@ In the first part of this lab, you'll determine a confidence interval for Washin
 ```{r Task1}
 era5_data_filtered <- era5_data %>%
   filter(st_name == "Washington") %>%
-  group_by(time_range) %>%
-  summarize(Mean_precip_meters = mean(prcp_m),
+  group_by(time_range, st_name) %>%
+  summarize(mean_precip = mean(prcp_m),
             sd_precip_meters = sd(prcp_m),
             num_obs = n(), #Do not include any var name here
             se_precip_meters = sd_precip_meters/sqrt(num_obs))
@@ -61,8 +61,8 @@ z.score_upper_95 = qnorm(0.975)
 
 era5_data_filtered_CI <- era5_data_filtered %>%
   mutate(error = z.score_upper_95 * se_precip_meters,
-         ci_upper = Mean_precip_meters + error,
-         ci_lower = Mean_precip_meters - error)
+         ci_upper = mean_precip + error,
+         ci_lower = mean_precip - error)
 
 kable(era5_data_filtered_CI)
 
@@ -73,10 +73,10 @@ Using the code provided in class, create a ggplot graphic that visualizes these 
 **Task 2** _Create a ggplot graphic as described above to show the confidence intervals for precipitation in Washington for each time range._
 
 ```{r Task 2}
-ggplot(era5_data_filtered_CI %>% mutate(State=reorder(st_name,Mean_precip_meters)))+
+ggplot(era5_data_filtered_CI %>% mutate(State=reorder(st_name,mean_precip)))+
   geom_linerange(aes(xmin=ci_lower,xmax=ci_upper,y=time_range,group=time_range, color = time_range)) +
-  geom_point(aes(x=Mean_precip_meters, y=time_range, color=time_range)) +
-  labs(title="Avg. Precip Confidence Intervals (WA, 1950-69 vs. 2005-24)") +
+  geom_point(aes(x=mean_precip, y=time_range, color=time_range)) +
+  labs(title="Avg. Precip (m) Confidence Intervals (WA, 1950-69 vs. 2005-24)") +
   theme(plot.title = element_text(size=9))
 
 ```
@@ -96,7 +96,7 @@ To start with, adapt your code from step 1 so that you create confidence interva
 era5_data_filtered_cty <- era5_data %>%
   filter(st_name == "Washington") %>%
   group_by(time_range,cty_name) %>%
-  summarize(Mean_precip_meters = mean(prcp_m),
+  summarize(mean_precip = mean(prcp_m),
             sd_precip_meters = sd(prcp_m),
             num_obs = n(), #Do not include any var name here
             se_precip_meters = sd_precip_meters/sqrt(num_obs))
@@ -106,8 +106,8 @@ z.score_upper_95 = qnorm(0.975)
 
 era5_data_filtered_CI_cty <- era5_data_filtered_cty %>%
   mutate(error = z.score_upper_95 * se_precip_meters,
-         ci_upper_cty = Mean_precip_meters + error,
-         ci_lower_cty = Mean_precip_meters - error)
+         ci_upper_cty = mean_precip + error,
+         ci_lower_cty = mean_precip - error)
 
 kable(head(era5_data_filtered_CI_cty))
 ```
@@ -115,9 +115,9 @@ kable(head(era5_data_filtered_CI_cty))
 **Task 5** _Visualize the confidence intervals for the county-level data you generated in task 4, using the same style as you did for Task 2 above. For an optional extra challenge, visually highlight the counties where the confidence intervals between time periods do NOT overlap._
 
 ```{r Task5}
-ggplot(era5_data_filtered_CI_cty %>% mutate(County=reorder(cty_name,Mean_precip_meters))) +
+ggplot(era5_data_filtered_CI_cty %>% mutate(County=reorder(cty_name,mean_precip))) +
   geom_linerange(aes(xmin=ci_lower_cty,xmax=ci_upper_cty,y=County,group=time_range, color = time_range)) +
-  geom_point(aes(x=Mean_precip_meters, y=County, color=time_range)) +
+  geom_point(aes(x=mean_precip, y=County, color=time_range)) +
   labs(title="Avg. Precip Confidence Intervals (WA Counties, 1950-69 vs. 2005-24)") +
   theme(plot.title = element_text(size=7)) + 
   theme(axis.text.y = element_text(size=5.5))
@@ -139,14 +139,12 @@ WA_cty_census_data <- st_read('data/acsdata_cty_westreg.gpkg') %>%
 
 # Making the era5 df wider
 era5_data_filtered_cty_wider <- era5_data_filtered_cty %>%
-  select(cty_name, time_range, Mean_precip_meters) %>%
-  pivot_wider(id_cols = cty_name, names_from = time_range, values_from = Mean_precip_meters)
+  select(cty_name, time_range, mean_precip) %>%
+  pivot_wider(id_cols = cty_name, names_from = time_range, values_from = mean_precip)
 
 # Altering the era5 data to include the precip difference
 era5_data_filtered_cty_wider <- era5_data_filtered_cty_wider %>%
-  mutate(change_precip_in_cm = round(((era5_data_filtered_cty_wider$`2005-24` - era5_data_filtered_cty_wider$`1950-69`) * 100), digits = 2)) #%>%
-  #mutate(change_precip_in_cm = change_in_precip*100)
-
+  mutate(change_precip_in_cm = round(((era5_data_filtered_cty_wider$`2005-24` - era5_data_filtered_cty_wider$`1950-69`) * 100), digits = 2))
 # Trying the spatial join
 era5_acs_joined <- era5_data_filtered_cty_wider %>%
   left_join(WA_cty_census_data, by='cty_name') %>%
@@ -154,7 +152,7 @@ era5_acs_joined <- era5_data_filtered_cty_wider %>%
 
 # Trying to make the plot
 tm_shape(era5_acs_joined) +
-  tm_polygons(fill = "change_precip_in_cm", palette = "-YlOrRd", title = "Prcp Change", style = "jenks") +
+  tm_polygons(fill = "change_precip_in_cm", palette = "-YlOrRd", title = "Prcp Change", style = "jenks", legend.format = list(text.separator = " to ")) +
   tm_title("Change in Precip (cm) Between 1950-69 and 2005-24 in WA")
 
 ```
