@@ -3,7 +3,7 @@ Geog 4/6300: Lab 3-Confidence intervals
 
 ## Confidence intervals
 
-**Your name: {Name here}**
+**Your name: Grayson Smith**
 
 **Overview:**
 
